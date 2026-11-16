@@ -85,4 +85,4 @@ npm run dev
 The agent only drafts a proposal with sources; an admin approves it. Without a key, everything else works.
 
 ## Scripts
-`npm run dev` · `npm run build` · `npm run preview`
+`npm run dev` · `npm run build` · `npm run preview` · `npm run test:db` (database permission and scoring tests, no Supabase needed)
