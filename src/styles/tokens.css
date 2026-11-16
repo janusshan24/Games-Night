@@ -1,0 +1,122 @@
+/* ==================================================================
+   Games Night design tokens: party theme
+   Dark "night party" is the default. A bright "day party" light mode
+   is used when the device prefers light, or data-theme="light".
+   Components use only these tokens, never raw colours.
+   ================================================================== */
+:root {
+  /* Party palette */
+  --party-pink: #ff3d9a;
+  --party-purple: #8b5cf6;
+  --party-cyan: #22d3ee;
+  --party-lime: #a3e635;
+  --party-gold: #ffd23f;
+  --party-orange: #ff8a3d;
+
+  /* Surfaces (night) */
+  --bg: #140a2e;
+  --bg-glow-1: rgba(255, 61, 154, 0.22);
+  --bg-glow-2: rgba(34, 211, 238, 0.16);
+  --surface: #1f1442;
+  --surface-2: #2a1d57;
+  --surface-hover: #33246a;
+  --border: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.22);
+
+  /* Text */
+  --text: #f6f2ff;
+  --text-muted: #b6a9d9;
+  --text-on-accent: #ffffff;
+
+  /* Semantic */
+  --primary: var(--party-pink);
+  --primary-hover: #ff5cad;
+  --secondary: var(--party-purple);
+  --accent: var(--party-cyan);
+  --success: var(--party-lime);
+  --warning: var(--party-gold);
+  --danger: #ff4d5e;
+  --gold: #ffd23f;
+  --silver: #d6d9e6;
+  --bronze: #e39b5b;
+
+  --gradient-party: linear-gradient(120deg, var(--party-pink), var(--party-purple) 50%, var(--party-cyan));
+  --gradient-warm: linear-gradient(120deg, var(--party-orange), var(--party-pink));
+
+  /* Type */
+  --font-display: 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: clamp(2rem, 5vw, 2.75rem);
+
+  /* Spacing (4px scale) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Shape and depth */
+  --radius-sm: 8px;
+  --radius: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+  --shadow: 0 8px 28px rgba(5, 0, 20, 0.45);
+  --glow-primary: 0 0 0 3px rgba(255, 61, 154, 0.35);
+
+  /* Layout */
+  --sidebar-width: 240px;
+  --tabbar-height: 64px;
+  --content-max: 1100px;
+  --tap: 44px; /* minimum touch target for iPhone/Android */
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme='dark']) {
+    --bg: #fff6fb;
+    --bg-glow-1: rgba(255, 61, 154, 0.14);
+    --bg-glow-2: rgba(34, 211, 238, 0.14);
+    --surface: #ffffff;
+    --surface-2: #f6efff;
+    --surface-hover: #efe4ff;
+    --border: rgba(40, 10, 80, 0.1);
+    --border-strong: rgba(40, 10, 80, 0.22);
+    --text: #22123f;
+    --text-muted: #6b5a8e;
+    --primary: #e6197f;
+    --primary-hover: #c80f6c;
+    --accent: #0891b2;
+    --success: #4d7c0f;
+    --warning: #b7791f;
+    --shadow: 0 8px 24px rgba(60, 20, 110, 0.12);
+    color-scheme: light;
+  }
+}
+:root[data-theme='light'] {
+  --bg: #fff6fb;
+  --bg-glow-1: rgba(255, 61, 154, 0.14);
+  --bg-glow-2: rgba(34, 211, 238, 0.14);
+  --surface: #ffffff;
+  --surface-2: #f6efff;
+  --surface-hover: #efe4ff;
+  --border: rgba(40, 10, 80, 0.1);
+  --border-strong: rgba(40, 10, 80, 0.22);
+  --text: #22123f;
+  --text-muted: #6b5a8e;
+  --primary: #e6197f;
+  --primary-hover: #c80f6c;
+  --accent: #0891b2;
+  --success: #4d7c0f;
+  --warning: #b7791f;
+  --shadow: 0 8px 24px rgba(60, 20, 110, 0.12);
+  color-scheme: light;
+}
