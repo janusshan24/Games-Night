@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from 'react'
+import type * as React from 'react'
 import { initials, playerColour } from '../lib/format'
 
 type Variant = 'primary' | 'party' | 'secondary' | 'ghost' | 'danger'
@@ -107,4 +108,47 @@ export function Loading() {
 
 export function Alert({ tone, children }: { tone?: 'error' | 'success'; children: ReactNode }) {
   return <div className={tone ? `alert alert--${tone}` : 'alert'}>{children}</div>
+}
+
+export function TextArea({
+  label,
+  hint,
+  ...rest
+}: React.TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string; hint?: string }) {
+  return (
+    <label className="field">
+      <span className="field__label">{label}</span>
+      <textarea className="textarea" {...rest} />
+      {hint && <span className="field__hint">{hint}</span>}
+    </label>
+  )
+}
+
+export function Select({
+  label,
+  children,
+  ...rest
+}: React.SelectHTMLAttributes<HTMLSelectElement> & { label: string }) {
+  return (
+    <label className="field">
+      <span className="field__label">{label}</span>
+      <select className="select" {...rest}>
+        {children}
+      </select>
+    </label>
+  )
+}
+
+export function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+  return (
+    <div className="modal" role="dialog" aria-modal="true" aria-label={title} onClick={onClose}>
+      <div className="modal__panel card" onClick={(e) => e.stopPropagation()}>
+        <div className="card__title">
+          <span>{title}</span>
+          <button className="btn btn--ghost btn--sm" onClick={onClose} aria-label="Close">✕</button>
+        </div>
+        {children}
+      </div>
+    </div>
+  )
 }

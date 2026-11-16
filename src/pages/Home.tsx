@@ -60,6 +60,7 @@ export function Home() {
                 {formatDateTime(nextNight.scheduled_at)}
                 {nextNight.location && ` · ${nextNight.location}`}
               </p>
+              <Link to={`/nights/${nextNight.id}`}>RSVP and details →</Link>
             </div>
           ) : (
             <Empty icon="🎉">No games night planned yet.</Empty>
@@ -71,11 +72,11 @@ export function Home() {
             <p className="muted">Checking…</p>
           ) : signed ? (
             <p>
-              <Badge tone="lime">✓ Signed</Badge> You've signed the current declaration.
+              <Badge tone="lime">✓ Signed</Badge> You've signed the current declaration. <Link to="/declaration">View</Link>
             </p>
           ) : (
             <p>
-              <Badge tone="gold">Needs signature</Badge> You'll sign the no-cheating declaration before your next game.
+              <Badge tone="gold">Needs signature</Badge> Sign the no-cheating declaration before your next game. <Link to="/declaration">Sign now →</Link>
             </p>
           )}
         </Card>

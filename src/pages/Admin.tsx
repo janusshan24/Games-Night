@@ -3,8 +3,8 @@ import { Badge, Card, PageHeader } from '../components/ui'
 
 const SECTIONS = [
   { to: '/admin/players', icon: '👥', title: 'Players & permissions', text: 'Promote admins, pause accounts.', ready: true },
-  { to: '/admin', icon: '🎲', title: 'Games library', text: 'Add and organise games.', ready: false },
-  { to: '/admin', icon: '⚙️', title: 'League settings', text: 'Points per placement, approvals, declaration.', ready: false },
+  { to: '/games', icon: '🎲', title: 'Games library', text: 'Add, edit and archive games.', ready: true },
+  { to: '/admin/settings', icon: '⚙️', title: 'League settings', text: 'Points per placement, approvals, declaration, AI rules agent.', ready: true },
   { to: '/admin', icon: '🧾', title: 'Audit log', text: 'Every score, rule and admin change.', ready: false },
 ]
 

@@ -32,3 +32,88 @@ export interface LeagueRow {
   nights_played: number
   win_rate: number
 }
+
+export type ProposalStatus = 'proposed' | 'approved' | 'rejected' | 'retired'
+export type MatchStatus = 'setup' | 'in_progress' | 'scoring' | 'completed' | 'void'
+export type RsvpStatus = 'invited' | 'going' | 'maybe' | 'declined'
+
+export interface Game {
+  id: string
+  name: string
+  description: string | null
+  category: string | null
+  min_players: number
+  max_players: number
+  estimated_minutes: number | null
+  scoring_type: ScoringType
+  supports_teams: boolean
+  rules_summary: string | null
+  official_rules_url: string | null
+  image_url: string | null
+  tags: string[]
+  archived_at: string | null
+  created_by: string | null
+}
+
+export interface RuleSource {
+  title: string
+  url: string
+}
+
+export interface RuleProposal {
+  id: string
+  game_id: string
+  proposed_text: string
+  sources: RuleSource[]
+  origin: 'manual' | 'agent'
+  status: ProposalStatus
+  proposed_by: string | null
+  created_at: string
+}
+
+export interface HouseRule {
+  id: string
+  game_id: string | null
+  title: string
+  body: string
+  status: ProposalStatus
+  proposed_by: string | null
+  created_at: string
+}
+
+export interface DeclarationVersion {
+  id: string
+  version: number
+  title: string
+  body: string
+  penalty_terms: string
+}
+
+export interface EventParticipant {
+  event_id: string
+  player_id: string
+  rsvp: RsvpStatus
+  attended: boolean
+  checked_in_at: string | null
+}
+
+export interface Match {
+  id: string
+  event_id: string
+  game_id: string
+  status: MatchStatus
+  is_team_game: boolean
+  scoring_type: ScoringType
+  started_at: string | null
+  ended_at: string | null
+  void_reason: string | null
+  created_at: string
+}
+
+export const SCORING_LABELS: Record<ScoringType, string> = {
+  high_score: 'Highest score wins',
+  low_score: 'Lowest score wins',
+  win_loss: 'Win / lose',
+  placement: 'Finishing places',
+  rounds: 'Points per round',
+}
