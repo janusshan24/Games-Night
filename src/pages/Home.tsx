@@ -93,7 +93,8 @@ export function Home() {
   )
 }
 
-export function LeagueTable({ rows }: { rows: LeagueRow[] }) {
+export function LeagueTable({ rows, full }: { rows: LeagueRow[]; full?: boolean }) {
+  const rank = (i: number) => rows.findIndex((x) => x.total === rows[i].total) + 1
   return (
     <div className="table-wrap">
       <table className="table">
@@ -101,25 +102,29 @@ export function LeagueTable({ rows }: { rows: LeagueRow[] }) {
           <tr>
             <th>#</th>
             <th>Player</th>
-            <th className="num">Played</th>
+            {full && <th className="num">Nights</th>}
+            <th className="num hide-sm">Played</th>
             <th className="num">Wins</th>
-            <th className="num">Penalties</th>
+            {full && <th className="num">Win rate</th>}
+            <th className="num hide-sm">Penalties</th>
             <th className="num">Points</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r, i) => (
             <tr key={r.player_id}>
-              <td><Rank n={i + 1} /></td>
+              <td><Rank n={rank(i)} /></td>
               <td>
                 <span className="row" style={{ gap: 'var(--space-2)', flexWrap: 'nowrap' }}>
                   <Avatar id={r.player_id} name={r.display_name} size={28} />
                   {r.display_name}
                 </span>
               </td>
-              <td className="num">{r.games_played}</td>
+              {full && <td className="num">{r.nights_played}</td>}
+              <td className="num hide-sm">{r.games_played}</td>
               <td className="num">{r.wins}</td>
-              <td className="num">{r.penalty_points ? `−${r.penalty_points}` : '–'}</td>
+              {full && <td className="num">{r.win_rate}%</td>}
+              <td className="num hide-sm">{r.penalty_points ? `−${r.penalty_points}` : '–'}</td>
               <td className="num"><strong>{r.total}</strong></td>
             </tr>
           ))}

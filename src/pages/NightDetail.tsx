@@ -9,6 +9,7 @@ import { Alert, Avatar, Badge, Button, Card, Empty, Modal, Select } from '../com
 import { NightForm, STATUS_BADGE } from './Nights'
 import { MATCH_BADGE } from './match/MatchDetail'
 import { GamePicker } from '../components/GamePicker'
+import { NightLeaderboard } from '../components/NightLeaderboard'
 
 type Night = GamesNight & { notes: string | null; host_id: string | null }
 interface MatchRow extends Match {
@@ -29,6 +30,7 @@ export function NightDetail() {
   const [editing, setEditing] = useState(false)
   const [adding, setAdding] = useState<string | null>(null)
   const [picking, setPicking] = useState(false)
+  const [finalising, setFinalising] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
@@ -105,6 +107,7 @@ export function NightDetail() {
           {isAdmin && open && (
             <div className="row">
               {night.status === 'planned' && <Button variant="party" onClick={() => setStatus('live')}>🎉 Start the night</Button>}
+              {night.status === 'live' && <Button variant="party" onClick={() => setFinalising(true)}>🏁 End the night</Button>}
               <Button variant="secondary" size="sm" onClick={() => setEditing(true)}>Edit</Button>
               {night.status === 'planned' && <Button variant="ghost" size="sm" onClick={() => setStatus('cancelled')}>Cancel night</Button>}
             </div>
@@ -115,7 +118,7 @@ export function NightDetail() {
 
       {error && <Alert tone="error">{error}</Alert>}
 
-      {open && (
+      {(night.status === 'planned' || (night.status === 'live' && !me?.attended)) && (
         <Card title="Are you coming?" highlight>
           <div className="row">
             {(['going', 'maybe', 'declined'] as RsvpStatus[]).map((r) => (
@@ -134,6 +137,8 @@ export function NightDetail() {
           )}
         </Card>
       )}
+
+      {(night.status === 'live' || night.status === 'finalised') && <NightLeaderboard eventId={night.id} finalised={night.status === 'finalised'} />}
 
       <div className="grid" style={{ alignItems: 'start' }}>
         <Card title={`👥 Players (${people.filter((p) => p.attended).length} here · ${people.filter((p) => p.rsvp === 'going').length} going)`}>
@@ -211,6 +216,14 @@ export function NightDetail() {
       </div>
 
       {editing && <NightForm night={night} onClose={() => setEditing(false)} onSaved={load} />}
+      {finalising && (
+        <FinaliseNight
+          eventId={night.id}
+          unfinished={matches.filter((m) => ['setup', 'in_progress', 'scoring'].includes(m.status)).map((m) => games[m.game_id]?.name ?? 'Game')}
+          onClose={() => setFinalising(false)}
+          onDone={load}
+        />
+      )}
       {picking && (
         <Modal title="🎰 Random game picker" onClose={() => setPicking(false)}>
           <GamePicker
@@ -322,6 +335,48 @@ function AddMatch({
         {error && <Alert tone="error">{error}</Alert>}
         <Button type="submit" variant="party" disabled={!game}>Add game</Button>
       </form>
+    </Modal>
+  )
+}
+
+function FinaliseNight({ eventId, unfinished, onClose, onDone }: { eventId: string; unfinished: string[]; onClose: () => void; onDone: () => void }) {
+  const [voidThem, setVoidThem] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState(false)
+
+  async function finalise() {
+    setBusy(true)
+    setError(null)
+    const { error } = await supabase.rpc('finalize_event', { p_event: eventId, p_void_unfinished: voidThem })
+    setBusy(false)
+    if (error) return setError(error.message)
+    onDone()
+    onClose()
+  }
+
+  return (
+    <Modal title="🏁 End the night" onClose={onClose}>
+      <div className="stack">
+        <p>
+          This locks tonight’s results, adds them to the league table, awards achievements and tells everyone who won. It
+          can’t be undone, but nothing is deleted.
+        </p>
+        {unfinished.length > 0 && (
+          <>
+            <Alert tone="error">
+              Still waiting on scores: {unfinished.join(', ')}. Finish them first, or void them below.
+            </Alert>
+            <label className="checkbox">
+              <input type="checkbox" checked={voidThem} onChange={(e) => setVoidThem(e.target.checked)} />
+              <span>Void the unfinished games (they won’t count)</span>
+            </label>
+          </>
+        )}
+        {error && <Alert tone="error">{error}</Alert>}
+        <Button variant="party" onClick={finalise} disabled={busy || (unfinished.length > 0 && !voidThem)}>
+          Finalise results
+        </Button>
+      </div>
     </Modal>
   )
 }

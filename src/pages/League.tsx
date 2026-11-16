@@ -16,9 +16,9 @@ export function League() {
 
   return (
     <>
-      <PageHeader title="League table" subtitle="Cumulative points across every finalised games night, minus penalties." />
+      <PageHeader title="League table" subtitle="Points from every finalised games night, minus penalties. Ties share a place." />
       <Card>
-        {rows === null ? <p className="muted">Loading…</p> : rows.length === 0 ? <Empty icon="🏆">No players yet.</Empty> : <LeagueTable rows={rows} />}
+        {rows === null ? <p className="muted">Loading…</p> : rows.length === 0 ? <Empty icon="🏆">No players yet.</Empty> : <LeagueTable rows={rows} full />}
       </Card>
     </>
   )

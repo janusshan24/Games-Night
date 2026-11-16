@@ -8,6 +8,8 @@ import { AdminPlayers } from './pages/AdminPlayers'
 import { AdminSettings } from './pages/AdminSettings'
 import { Coming } from './pages/Coming'
 import { Declaration } from './pages/Declaration'
+import { Disputes } from './pages/Disputes'
+import { History } from './pages/History'
 import { GameDetail } from './pages/GameDetail'
 import { Games } from './pages/Games'
 import { HouseRules } from './pages/HouseRules'
@@ -48,8 +50,8 @@ export default function App() {
               <Route path="players" element={<Players />} />
               <Route path="players/:id" element={<PlayerDetail />} />
               <Route path="rules" element={<HouseRules />} />
-              <Route path="disputes" element={<Coming title="Disputes" icon="⚖️" phase={4} text="Report incidents, add evidence and vote on penalties." />} />
-              <Route path="history" element={<Coming title="History" icon="🗂️" phase={4} text="Every past games night and its results." />} />
+              <Route path="disputes" element={<Disputes />} />
+              <Route path="history" element={<History />} />
               <Route element={<RequireAdmin />}>
                 <Route path="admin" element={<Admin />} />
                 <Route path="admin/players" element={<AdminPlayers />} />

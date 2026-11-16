@@ -75,17 +75,30 @@ export function PlayerDetail() {
   const [nights, setNights] = useState<{ event_id: string; attended: boolean; events: { name: string; scheduled_at: string } | null }[]>([])
   const [badges, setBadges] = useState<Achievement[]>([])
   const [signed, setSigned] = useState(false)
+  const [perGame, setPerGame] = useState<{ game_id: string; game_name: string; played: number; wins: number; avg_place: number }[]>([])
+  const [streaks, setStreaks] = useState({ best: 0, current: 0 })
 
   useEffect(() => {
     if (!id) return
     void (async () => {
-      const [p, s, n, a, d] = await Promise.all([
+      const [p, s, n, a, d, pg, fr] = await Promise.all([
         supabase.from('profiles').select('*').eq('id', id).maybeSingle(),
         supabase.from('player_stats').select('*').eq('player_id', id).maybeSingle(),
         supabase.from('event_participants').select('event_id, attended, events(name, scheduled_at)').eq('player_id', id).eq('attended', true),
         supabase.from('player_achievements').select('achievement, earned_at, achievements(name, description, icon)').eq('player_id', id),
         supabase.rpc('has_signed_current_declaration', { p_player: id }),
+        supabase.from('player_game_stats').select('*').eq('player_id', id).order('played', { ascending: false }),
+        supabase.from('final_results').select('is_winner, recorded_at').eq('player_id', id).order('recorded_at'),
       ])
+      setPerGame(pg.data ?? [])
+      // Winning streaks across games in finalised nights.
+      let best = 0
+      let run = 0
+      for (const r of (fr.data ?? []) as { is_winner: boolean }[]) {
+        run = r.is_winner ? run + 1 : 0
+        best = Math.max(best, run)
+      }
+      setStreaks({ best, current: run })
       setPlayer(p.data as Profile | null)
       setStats(s.data as PlayerStats | null)
       setNights((n.data as unknown as typeof nights | null) ?? [])
@@ -118,7 +131,38 @@ export function PlayerDetail() {
         <Stat label="Win rate" value={`${winRate}%`} />
         <Stat label="Points" value={stats?.points ?? 0} />
         <Stat label="Penalties" value={stats?.penalties ?? 0} />
+        <Stat label="Best streak" value={`${streaks.best}🔥`} />
+        <Stat label="Current streak" value={streaks.current} />
       </div>
+
+      {perGame.length > 0 && (
+        <Card title="🎲 Record by game">
+          <div className="table-wrap">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Game</th>
+                  <th className="num">Played</th>
+                  <th className="num">Wins</th>
+                  <th className="num">Win rate</th>
+                  <th className="num">Avg place</th>
+                </tr>
+              </thead>
+              <tbody>
+                {perGame.map((g) => (
+                  <tr key={g.game_id}>
+                    <td><Link to={`/games/${g.game_id}`}>{g.game_name}</Link></td>
+                    <td className="num">{g.played}</td>
+                    <td className="num">{g.wins}</td>
+                    <td className="num">{Math.round((100 * g.wins) / g.played)}%</td>
+                    <td className="num">{g.avg_place}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
 
       <div className="grid">
         <Card title="Achievements">

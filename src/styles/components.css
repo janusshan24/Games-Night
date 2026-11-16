@@ -453,3 +453,10 @@ a.list__item:hover { text-decoration: none; background: var(--surface-hover); }
 }
 .picker__name { font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 700; }
 .picker--spinning .picker__name { opacity: 0.75; filter: blur(0.5px); }
+
+/* ---------- Small-phone tweaks ---------- */
+.badge { white-space: nowrap; }
+@media (max-width: 520px) {
+  .table th, .table td { padding: var(--space-2) 6px; }
+  .hide-sm { display: none; }
+}

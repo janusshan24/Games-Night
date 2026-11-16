@@ -19,6 +19,11 @@ check-in and the games played that night.
 points per round), random teams with team scoring, players approve or dispute scores before they count (admins can
 settle disputes), live turn tracker and shared countdown timer, and a random game picker.
 
+**Phase 4 (competition) done:** live nightly leaderboard, full league table with win rates, admin "End the night"
+(locks results, voids unfinished games if chosen, awards achievements, announces the champion), history of past nights,
+cheating reports with evidence links, group voting (the accused can't vote) and admin decisions with penalty points
+that come off the league table, plus per-game records and winning streaks on player profiles.
+
 ## Set up (about 15 minutes, all free, no coding)
 
 You need two free accounts. Sign up to both with your GitHub account to keep it simple.
