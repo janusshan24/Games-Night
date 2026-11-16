@@ -6,6 +6,9 @@ import { isConfigured } from './lib/supabase'
 import { Admin } from './pages/Admin'
 import { AdminPlayers } from './pages/AdminPlayers'
 import { AdminSettings } from './pages/AdminSettings'
+import { AdminDeclaration } from './pages/AdminDeclaration'
+import { AuditLog } from './pages/AuditLog'
+import { Notifications } from './pages/Notifications'
 import { Coming } from './pages/Coming'
 import { Declaration } from './pages/Declaration'
 import { Disputes } from './pages/Disputes'
@@ -37,6 +40,7 @@ export default function App() {
             <Route element={<AppShell />}>
               <Route index element={<Home />} />
               <Route path="me" element={<Me />} />
+              <Route path="notifications" element={<Notifications />} />
               <Route path="more" element={<MoreMenu />} />
               <Route path="design" element={<DesignSystem />} />
               <Route path="league" element={<League />} />
@@ -56,8 +60,10 @@ export default function App() {
                 <Route path="admin" element={<Admin />} />
                 <Route path="admin/players" element={<AdminPlayers />} />
                 <Route path="admin/settings" element={<AdminSettings />} />
+                <Route path="admin/declaration" element={<AdminDeclaration />} />
+                <Route path="admin/audit" element={<AuditLog />} />
               </Route>
-              <Route path="*" element={<Coming title="Not found" icon="🤔" phase={1} text="That page doesn't exist." />} />
+              <Route path="*" element={<Coming title="Not found" icon="🤔" text="That page doesn't exist." />} />
             </Route>
           </Route>
         </Routes>

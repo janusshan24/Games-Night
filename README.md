@@ -24,6 +24,10 @@ settle disputes), live turn tracker and shared countdown timer, and a random gam
 cheating reports with evidence links, group voting (the accused can't vote) and admin decisions with penalty points
 that come off the league table, plus per-game records and winning streaks on player profiles.
 
+**Phase 5 (notifications and admin) done:** automatic notifications (new nights, scores to check, results, house rule
+votes, reports, achievements, rules updates) with a live bell and inbox, admin announcements, admin dashboard with a
+"needs attention" list, versioned fair-play declaration editor (players re-sign), and a searchable audit log.
+
 ## Set up (about 15 minutes, all free, no coding)
 
 You need two free accounts. Sign up to both with your GitHub account to keep it simple.

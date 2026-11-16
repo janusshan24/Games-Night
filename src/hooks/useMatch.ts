@@ -46,7 +46,7 @@ export function useMatch(id: string | undefined) {
     void load()
     if (!id) return
     const channel = supabase
-      .channel(`match-${id}`)
+      .channel(`match-${id}-${crypto.randomUUID()}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'matches', filter: `id=eq.${id}` }, () => void load())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'score_entries', filter: `match_id=eq.${id}` }, () => void load())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'score_approvals' }, () => void load())

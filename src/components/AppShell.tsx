@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../auth/AuthProvider'
 import { Avatar } from './ui'
+import { useNotifications } from '../hooks/useNotifications'
 
 interface NavItem {
   to: string
@@ -26,6 +27,7 @@ const NAV: NavItem[] = [
 export function AppShell() {
   const { profile, isAdmin, signOut } = useAuth()
   const items = NAV.filter((n) => !n.admin || isAdmin)
+  const { unread } = useNotifications()
 
   return (
     <div className="shell">
@@ -38,6 +40,11 @@ export function AppShell() {
           </NavLink>
         ))}
         <div className="shell__spacer" />
+        <NavLink to="/notifications" className="nav-link">
+          <span className="nav-link__icon">🔔</span>
+          Notifications
+          {unread > 0 && <span className="bell__count nav-count" style={{ position: 'static' }}>{unread}</span>}
+        </NavLink>
         {profile && (
           <NavLink to="/me" className="nav-link">
             <Avatar id={profile.id} name={profile.display_name} size={28} />
@@ -52,11 +59,17 @@ export function AppShell() {
 
       <header className="topbar">
         <Brand />
-        {profile && (
-          <NavLink to="/me" aria-label="My profile">
-            <Avatar id={profile.id} name={profile.display_name} size={32} />
+        <div className="row" style={{ gap: 'var(--space-2)' }}>
+          <NavLink to="/notifications" className="bell" aria-label={`Notifications${unread ? `, ${unread} unread` : ''}`}>
+            🔔
+            {unread > 0 && <span className="bell__count">{unread > 9 ? '9+' : unread}</span>}
           </NavLink>
-        )}
+          {profile && (
+            <NavLink to="/me" aria-label="My profile">
+              <Avatar id={profile.id} name={profile.display_name} size={32} />
+            </NavLink>
+          )}
+        </div>
       </header>
 
       <main className="shell__main">

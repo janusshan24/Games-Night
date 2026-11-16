@@ -25,7 +25,7 @@ export function NightLeaderboard({ eventId, finalised }: { eventId: string; fina
     void load()
     if (finalised) return
     const ch = supabase
-      .channel(`night-${eventId}`)
+      .channel(`night-${eventId}-${crypto.randomUUID()}`)
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'matches', filter: `event_id=eq.${eventId}` }, () => void load())
       .subscribe()
     return () => {
