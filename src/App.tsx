@@ -13,6 +13,8 @@ import { Games } from './pages/Games'
 import { HouseRules } from './pages/HouseRules'
 import { NightDetail } from './pages/NightDetail'
 import { Nights } from './pages/Nights'
+import { MatchDetail } from './pages/match/MatchDetail'
+import { Picker } from './pages/Picker'
 import { PlayerDetail, Players } from './pages/Players'
 import { DesignSystem } from './pages/DesignSystem'
 import { Home } from './pages/Home'
@@ -41,6 +43,8 @@ export default function App() {
               <Route path="nights/:id" element={<NightDetail />} />
               <Route path="games" element={<Games />} />
               <Route path="games/:id" element={<GameDetail />} />
+              <Route path="matches/:id" element={<MatchDetail />} />
+              <Route path="picker" element={<Picker />} />
               <Route path="players" element={<Players />} />
               <Route path="players/:id" element={<PlayerDetail />} />
               <Route path="rules" element={<HouseRules />} />

@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthProvider'
 import { useProfiles } from '../hooks/useProfiles'
-import type { EventParticipant, Game, GamesNight, Match, MatchStatus, RsvpStatus } from '../lib/types'
+import type { EventParticipant, Game, GamesNight, Match, RsvpStatus } from '../lib/types'
 import { formatDateTime } from '../lib/format'
 import { Alert, Avatar, Badge, Button, Card, Empty, Modal, Select } from '../components/ui'
 import { NightForm, STATUS_BADGE } from './Nights'
+import { MATCH_BADGE } from './match/MatchDetail'
+import { GamePicker } from '../components/GamePicker'
 
 type Night = GamesNight & { notes: string | null; host_id: string | null }
 interface MatchRow extends Match {
@@ -14,13 +16,6 @@ interface MatchRow extends Match {
 }
 
 const RSVP_LABEL: Record<RsvpStatus, string> = { going: '✅ Going', maybe: '🤔 Maybe', declined: '❌ Can’t make it', invited: '✉️ Invited' }
-const MATCH_BADGE: Record<MatchStatus, { tone: 'lime' | 'cyan' | 'gold' | 'pink' | 'purple'; label: string }> = {
-  setup: { tone: 'cyan', label: 'Setting up' },
-  in_progress: { tone: 'lime', label: '● Playing' },
-  scoring: { tone: 'gold', label: 'Scoring' },
-  completed: { tone: 'purple', label: 'Completed' },
-  void: { tone: 'pink', label: 'Void' },
-}
 
 export function NightDetail() {
   const { id } = useParams()
@@ -32,7 +27,8 @@ export function NightDetail() {
   const [games, setGames] = useState<Record<string, Game>>({})
   const [signed, setSigned] = useState<Set<string>>(new Set())
   const [editing, setEditing] = useState(false)
-  const [adding, setAdding] = useState(false)
+  const [adding, setAdding] = useState<string | null>(null)
+  const [picking, setPicking] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const load = useCallback(async () => {
@@ -85,8 +81,6 @@ export function NightDetail() {
   const addPlayer = (playerId: string) =>
     run(supabase.from('event_participants').insert({ event_id: night.id, player_id: playerId, rsvp: 'going' }))
   const setStatus = (status: string) => run(supabase.from('events').update({ status }).eq('id', night.id))
-  const setMatchStatus = (m: Match, status: MatchStatus, extra: Record<string, unknown> = {}) =>
-    run(supabase.from('matches').update({ status, ...extra }).eq('id', m.id))
 
   const notInvited = profiles.filter((p) => p.is_active && !people.some((x) => x.player_id === p.id))
   const order: RsvpStatus[] = ['going', 'maybe', 'invited', 'declined']
@@ -182,47 +176,34 @@ export function NightDetail() {
 
         <Card
           title={`🎲 Games tonight (${matches.filter((m) => m.status !== 'void').length})`}
-          action={isAdmin && night.status === 'live' && <Button size="sm" variant="party" onClick={() => setAdding(true)}>+ Add game</Button>}
+          action={
+            night.status === 'live' && (
+              <div className="row" style={{ gap: 'var(--space-2)' }}>
+                <Button size="sm" variant="secondary" onClick={() => setPicking(true)}>🎰 Random</Button>
+                {isAdmin && <Button size="sm" variant="party" onClick={() => setAdding('')}>+ Add game</Button>}
+              </div>
+            )
+          }
         >
           {matches.length === 0 ? (
             <Empty icon="🎲">{night.status === 'live' ? 'No games started yet.' : 'Games are added once the night starts.'}</Empty>
           ) : (
             <div className="list">
               {matches.map((m) => (
-                <div key={m.id} className="list__item" style={{ alignItems: 'flex-start' }}>
+                <Link key={m.id} to={`/matches/${m.id}`} className="list__item">
                   <div className="list__main">
                     <div className="row" style={{ gap: 'var(--space-2)' }}>
                       <span className="list__title">{games[m.game_id]?.name ?? 'Game'}</span>
                       <Badge tone={MATCH_BADGE[m.status].tone}>{MATCH_BADGE[m.status].label}</Badge>
+                      {m.is_team_game && <Badge tone="purple">Teams</Badge>}
                     </div>
                     <div className="list__meta">
                       {m.match_participants.map((x) => byId[x.player_id]?.display_name).filter(Boolean).join(', ')}
                       {m.void_reason && ` · void: ${m.void_reason}`}
                     </div>
-                    {isAdmin && night.status === 'live' && (
-                      <div className="row" style={{ marginTop: 'var(--space-2)', gap: 'var(--space-2)' }}>
-                        {m.status === 'setup' && (
-                          <Button size="sm" onClick={() => setMatchStatus(m, 'in_progress', { started_at: new Date().toISOString() })}>▶ Start</Button>
-                        )}
-                        {m.status === 'in_progress' && (
-                          <Button size="sm" onClick={() => setMatchStatus(m, 'scoring', { ended_at: new Date().toISOString() })}>🏁 Finish</Button>
-                        )}
-                        {m.status !== 'void' && m.status !== 'completed' && (
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => {
-                              const reason = window.prompt('Why is this game void?')
-                              if (reason) void setMatchStatus(m, 'void', { void_reason: reason })
-                            }}
-                          >
-                            Void
-                          </Button>
-                        )}
-                      </div>
-                    )}
                   </div>
-                </div>
+                  <span className="muted">›</span>
+                </Link>
               ))}
             </div>
           )}
@@ -230,14 +211,26 @@ export function NightDetail() {
       </div>
 
       {editing && <NightForm night={night} onClose={() => setEditing(false)} onSaved={load} />}
-      {adding && (
+      {picking && (
+        <Modal title="🎰 Random game picker" onClose={() => setPicking(false)}>
+          <GamePicker
+            games={Object.values(games)}
+            defaultPlayers={people.filter((p) => p.attended).length || undefined}
+            exclude={matches.filter((m) => m.status !== 'void').map((m) => m.game_id)}
+            onPick={isAdmin ? (g) => { setPicking(false); setAdding(g.id) } : undefined}
+            pickLabel="Play this tonight"
+          />
+        </Modal>
+      )}
+      {adding !== null && (
         <AddMatch
           eventId={night.id}
+          initialGame={adding}
           games={Object.values(games).filter((g) => !g.archived_at)}
           candidates={people.filter((p) => p.attended || p.rsvp === 'going').map((p) => p.player_id)}
           signed={signed}
           names={Object.fromEntries(Object.values(byId).map((p) => [p.id, p.display_name]))}
-          onClose={() => setAdding(false)}
+          onClose={() => setAdding(null)}
           onSaved={load}
         />
       )}
@@ -247,6 +240,7 @@ export function NightDetail() {
 
 function AddMatch({
   eventId,
+  initialGame,
   games,
   candidates,
   signed,
@@ -255,6 +249,7 @@ function AddMatch({
   onSaved,
 }: {
   eventId: string
+  initialGame: string
   games: Game[]
   candidates: string[]
   signed: Set<string>
@@ -263,7 +258,9 @@ function AddMatch({
   onSaved: () => void
 }) {
   const { profile } = useAuth()
-  const [gameId, setGameId] = useState('')
+  const navigate = useNavigate()
+  const [gameId, setGameId] = useState(initialGame)
+  const [teams, setTeams] = useState(false)
   const [chosen, setChosen] = useState<Set<string>>(new Set(candidates.filter((c) => signed.has(c))))
   const [error, setError] = useState<string | null>(null)
   const game = games.find((g) => g.id === gameId)
@@ -283,7 +280,7 @@ function AddMatch({
     }
     const { data, error } = await supabase
       .from('matches')
-      .insert({ event_id: eventId, game_id: game.id, scoring_type: game.scoring_type, is_team_game: false, created_by: profile!.id, turn_order: [...chosen] })
+      .insert({ event_id: eventId, game_id: game.id, scoring_type: game.scoring_type, is_team_game: teams && game.supports_teams, created_by: profile!.id, turn_order: [...chosen] })
       .select('id')
       .single()
     if (error) return setError(error.message)
@@ -292,7 +289,7 @@ function AddMatch({
       .insert([...chosen].map((player_id, i) => ({ match_id: data.id, player_id, seat: i + 1 })))
     if (e2) return setError(e2.message)
     onSaved()
-    onClose()
+    navigate(`/matches/${data.id}`)
   }
 
   return (
@@ -304,6 +301,12 @@ function AddMatch({
             <option key={g.id} value={g.id}>{g.name} ({g.min_players}–{g.max_players})</option>
           ))}
         </Select>
+        {game?.supports_teams && (
+          <label className="checkbox">
+            <input type="checkbox" checked={teams} onChange={(e) => setTeams(e.target.checked)} />
+            <span>Play in teams</span>
+          </label>
+        )}
         <div className="field">
           <span className="field__label">Who's playing? ({chosen.size})</span>
           {candidates.length === 0 && <span className="muted">Check players in first.</span>}

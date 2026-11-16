@@ -15,6 +15,10 @@ app shell, league table.
 cited sources and admin approval, optional AI rules agent, house rules with voting, and games nights with RSVP,
 check-in and the games played that night.
 
+**Phase 3 (games and scoring) done:** score entry for every format (highest, lowest, win/lose, finishing places,
+points per round), random teams with team scoring, players approve or dispute scores before they count (admins can
+settle disputes), live turn tracker and shared countdown timer, and a random game picker.
+
 ## Set up (about 10 minutes, all free)
 1. **Supabase**: create a free project at https://supabase.com.
    * SQL Editor → paste and run each file in `supabase/migrations/` in order (oldest first).

@@ -37,7 +37,12 @@ export function Games() {
       <PageHeader
         title="Games library"
         subtitle={`${games.filter((g) => !g.archived_at).length} games`}
-        action={<Button variant="party" onClick={() => setEditing('new')}>+ Add game</Button>}
+        action={
+          <div className="row">
+            <Link to="/picker" className="btn btn--secondary">🎰 Pick for me</Link>
+            <Button variant="party" onClick={() => setEditing('new')}>+ Add game</Button>
+          </div>
+        }
       />
       <Card>
         <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', marginBottom: 'var(--space-4)' }}>

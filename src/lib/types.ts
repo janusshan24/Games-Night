@@ -117,3 +117,48 @@ export const SCORING_LABELS: Record<ScoringType, string> = {
   placement: 'Finishing places',
   rounds: 'Points per round',
 }
+
+export interface Team {
+  id: string
+  match_id: string
+  name: string
+  color: string | null
+}
+
+export interface ScoreEntry {
+  id: string
+  match_id: string
+  player_id: string | null
+  team_id: string | null
+  round: number | null
+  value: number | null
+  placement: number | null
+  is_winner: boolean | null
+  status: 'pending' | 'approved' | 'disputed' | 'superseded'
+  submitted_by: string
+  submitted_at: string
+}
+
+export interface ScoreApproval {
+  score_entry_id: string
+  player_id: string
+  choice: 'approve' | 'dispute'
+  comment: string | null
+}
+
+export interface MatchResult {
+  match_id: string
+  player_id: string
+  team_id: string | null
+  placement: number
+  league_points: number
+  is_winner: boolean
+}
+
+export interface MatchFull extends Match {
+  current_round: number
+  current_turn_player: string | null
+  turn_order: string[]
+  timer_seconds: number | null
+  timer_started_at: string | null
+}
